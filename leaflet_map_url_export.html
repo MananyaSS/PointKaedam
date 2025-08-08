@@ -1,0 +1,104 @@
+<!-- บันทึกโค้ดนี้เป็นไฟล์ HTML -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แผนที่ศูนย์เครือข่าย อำเภอแกดำ</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.10.0/proj4.js"></script>
+<style>
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.leaflet-map-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 2em;
+}
+.leaflet-map-header {
+    background-color: #0073aa;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+.leaflet-map-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+#kaedam-map {
+    height: 500px;
+    width: 100%;
+}
+.map-tooltip {
+    background: white !important;
+    border: 1px solid #0073aa !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+</style>
+</head>
+<body>
+<div class="leaflet-map-wrapper">
+    <div class="leaflet-map-header">
+        <h3>แผนที่ศูนย์เครือข่าย อำเภอแกดำ</h3>
+    </div>
+    <div id="kaedam-map"></div>
+</div>
+<script>
+(function() {
+    const locations = [
+        { name: "ศูนย์จัดการดินปุ๋ยชุมชนบ้านหนองบัว", x: 331794, y: 1778418 },
+        { name: "ศูนย์จัดการศัตรูพืชชุมชนบ้านหัวขัว", x: 328229, y: 1772117 },
+        { name: "ศูนย์จัดการศัตรูพืชชุมชนบ้านโคกน้อย-โคกเจริญ", x: 329631, y: 1780679 },
+        { name: "ศูนย์เรียนรู้การเลี้ยงไก่งวง", x: 328742, y: 1775135 },
+        { name: "ศูนย์เรียนรู้การเลี้ยงโคเนื้อ", x: 326095, y: 1774521 },
+        { name: "ศูนย์เรียนรู้การผลิตข้าวอินทรีย์บ้านแสงเจริญ", x: 324061, y: 1776913 },
+        { name: "ศูนย์ผลิตเมล็ดพันธุ์ข้าวชุมชนบ้านหนองน้ำใส มิตรภาพ", x: 328208, y: 1776784 },
+        { name: "ศูนย์เรียนรู้การผลิตผลไม้ (ฝรั่งกิมจู)", x: 332859, y: 1781608 },
+        { name: "ศูนย์เรียนรู้เกษตรผสมผสานบ้านเหล่าจั่น", x: 327240, y: 1769251 },
+        { name: "กลุ่มจักสานบ้านนาภู", x: 325558, y: 1768065 },
+        { name: "ศูนย์ศพก.หลักบ้านหนองแต้", x: 329716, y: 1774968 },
+        { name: "ศูนย์เรียนรู้เกษตรทฤษฎีใหม่บ้านโนนเขวา", x: 329354, y: 1776024 },
+        { name: "ศูนย์เรียนรู้ศูนย์ข้าวชุมชนบ้านนาภู", x: 325274, y: 1768127 },
+        { name: "วิสาหกิจชุมชนเกษตรวิถีเชิงท่องเที่ยวทุ่งทอง", x: 327221, y: 1768563 },
+        { name: "ศูนย์เรียนรู้แปลงใหญ่โนนสีดา", x: 327664, y: 1773671 }
+    ];
+
+    const utm48n = '+proj=utm +zone=48 +ellps=WGS84 +datum=WGS84 +units=m +no_defs';
+    const wgs84 = 'WGS84';
+
+    const map = L.map('kaedam-map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const markerGroup = [];
+    locations.forEach(loc => {
+        const lngLat = proj4(utm48n, wgs84, [loc.x, loc.y]);
+        const marker = L.marker([lngLat[1], lngLat[0]]).addTo(map)
+            .bindPopup(`<b>${loc.name}</b>`)
+            .bindTooltip(loc.name, {
+                permanent: true,
+                direction: 'right',
+                offset: [10, 0],
+                className: 'map-tooltip'
+            });
+        markerGroup.push(marker);
+    });
+
+    if (markerGroup.length > 0) {
+        const group = new L.featureGroup(markerGroup);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+})();
+</script>
+</body>
+</html>
